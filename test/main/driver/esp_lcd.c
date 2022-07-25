@@ -9,7 +9,7 @@
  * 
  */
 
-#include "include/esp_lcd.h"
+#include "esp_lcd.h"
 #include <stdio.h>
 #include <string.h>
 #include <freertos/FreeRTOS.h>

@@ -1,9 +1,17 @@
+/**
+ * @file main.c
+ * @author Jesus Minjares (https://github.com/jminjares4)
+ * @brief Test driver code
+ * @version 0.1
+ * @date 2022-07-25
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include <stdio.h>
-#include "include/esp_lcd.h"
-
+#include "driver/esp_lcd.h"
 
 #define DEFAULT_LCD
-
 
 void app_main(void)
 {
