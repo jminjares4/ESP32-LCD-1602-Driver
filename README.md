@@ -117,10 +117,10 @@ void app_main(void)
 }
 ~~~
 
-## ***Add ESP-LCD to ESP32 Project***
+## **Add ESP-LCD to ESP32 Project**
 1) Copy driver folder
 2) Paste into esp project
-3) Edit cmake to use esp_lcd:
+3) Edit project CMakeLists.txt to use esp_lcd:
 ```cmake
 idf_component_register(SRCS "main.c"
                             "driver/esp_lcd.c"
