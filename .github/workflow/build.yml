@@ -1,0 +1,36 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+defaults:
+ run:
+  working-directory: test/
+
+jobs:
+  build:
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        type: [Debug]
+      
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v3
+      with:
+        submodules: 'true'
+        token: ${{secrets.PAT_TOKEN}}
+      
+    - name: arm-none-eabi-gcc
+      uses: ryanwinter/arm-none-eabi-gcc@master
+      with:
+        release: '10.3-2021.07'
+    
+    - name: build
+      run: |
+        cmake -Bbuild -G "Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="cmake/arm-gcc-cortex-m4.cmake" -DCMAKE_BUILD_TYPE="${{ matrix.type }}"
+        cmake --build build
