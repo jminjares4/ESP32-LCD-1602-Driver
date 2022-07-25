@@ -1,6 +1,6 @@
 
 <div align="center">
-  <img src="images/lcd.png" height="250">
+  <img src="images/lcd.png" height="250" width="500">
 </div>
 
 ## **Description**
