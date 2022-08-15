@@ -19,19 +19,25 @@
 #define LCD_DATA_LINE       4   /*!< 4-Bit data line */
 
 typedef struct{
-    uint32_t data[LCD_DATA_LINE];   /*!< LCD data line */
-    uint32_t enable;                /*!< LCD enable pin */
-    uint32_t regSel;                /*!< LCD register select */
+    gpio_num_t data[LCD_DATA_LINE];   /*!< LCD data line */
+    gpio_num_t en;                    /*!< LCD enable pin */
+    gpio_num_t regSel;                /*!< LCD register select */
 }lcd_t;
 
 void lcd_default(lcd_t *lcd);
 
-void lcd_ctor(lcd_t *lcd, uint32_t data[LCD_DATA_LINE], uint32_t enable, uint32_t regSel);
+void lcd_init(lcd_t * const lcd);
 
-void lcdSetText(lcd_t * const lcd, char * text, uint8_t x, uint8_t y);
+void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_num_t regSel);
 
-void lcdSetInt(lcd_t * const lcd, int val, uint8_t x, uint8_t y);
+void lcdSetText(lcd_t * const lcd, char * text, int x, int y);
+
+void lcdSetInt(lcd_t * const lcd, int val, int x, int y);
 
 void lcdClear(lcd_t * const lcd);
+
+void lcdTriggerEN(lcd_t * const lcd);
+
+void lcdWriteCmd(lcd_t * const lcd, unsigned char cmd, uint8_t lcd_opt);
 
 #endif
