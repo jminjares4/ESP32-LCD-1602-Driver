@@ -3,7 +3,7 @@
  * @author Jesus Minjares (https://github.com/jminjares4)
  * @brief Liquid Crystal Display source file
  * @version 0.1
- * @date 2022-07-02
+ * @date 2022-08-15
  * 
  * @copyright Copyright (c) 2022
  * 
@@ -15,10 +15,18 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
+#define LCD_DATA          0  /*!< LCD data */
+#define LCD_CMD           1  /*!< LCD command */
 #define GPIO_STATE_LOW    0  /*!< Logic low */
 #define GPIO_STATE_HIGH   1  /*!< Logic high */
 
-void lcdTriggerEN(lcd_t * const lcd) {
+/**
+ * @brief Trigger LCD enable pin
+ * 
+ * @param lcd   pointer to LCD object
+ * @return None
+ */
+static void lcdTriggerEN(lcd_t * const lcd) {
     gpio_set_level( lcd->en, GPIO_STATE_LOW);
     vTaskDelay( 1 / portTICK_PERIOD_MS );
     gpio_set_level( lcd->en, GPIO_STATE_HIGH);
@@ -27,7 +35,14 @@ void lcdTriggerEN(lcd_t * const lcd) {
     vTaskDelay( 1 / portTICK_PERIOD_MS );
 }
 
-void lownibble(lcd_t * const lcd , unsigned char x){
+/**
+ * @brief Transmitt lower nibble 
+ * 
+ * @param lcd   pointer to LCD object
+ * @param x     bits 
+ * @return None
+ */
+static void lownibble(lcd_t * const lcd , unsigned char x){
     // checkf if x is high for every bit
     uint8_t i, val = 0x01;
     for(i = 0; i < LCD_DATA_LINE; i++){
@@ -37,7 +52,15 @@ void lownibble(lcd_t * const lcd , unsigned char x){
     }
 }
 
-void lcdWriteCmd(lcd_t * const lcd, unsigned char cmd, uint8_t lcd_opt){
+/**
+ * @brief Write command to LCD object 
+ * 
+ * @param lcd       pointer to LCD object 
+ * @param cmd       LCD command 
+ * @param lcd_opt   0: data , 1: command
+ * @return None 
+ */
+static void lcdWriteCmd(lcd_t * const lcd, unsigned char cmd, uint8_t lcd_opt){
     //CMD: 1, DATA: 0
     (lcd_opt == LCD_CMD) ? gpio_set_level( lcd->regSel, GPIO_STATE_LOW) : gpio_set_level( lcd->regSel, GPIO_STATE_HIGH);
 
@@ -61,6 +84,7 @@ void lcdWriteCmd(lcd_t * const lcd, unsigned char cmd, uint8_t lcd_opt){
  * 
  * @param lcd   pointer to LCD object
  * @note  Must constructor LCD object. @see lcd_ctor() and @see lcd_default()
+ * @return None
  */
 void lcd_init(lcd_t * const lcd){  
     /* 100 ms delay */  
@@ -110,12 +134,12 @@ void lcd_init(lcd_t * const lcd){
  * 
  * @return None
  */
-void lcd_default(lcd_t *lcd){
+void lcd_default(lcd_t * const lcd){
 
     /* Default pins */
-    gpio_num_t data[LCD_DATA_LINE] = { 33, 32, 35, 34 }; /* Data pins */
-    gpio_num_t en = 39; /* Enable pin */
-    gpio_num_t regSel = 36; /* Register Select pin */
+    gpio_num_t data[4] = { 19, 18, 17, 16 }; /* Data pins */
+    gpio_num_t en = 22; /* Enable pin */
+    gpio_num_t regSel = 23; /* Register Select pin */
 
     /* Instantiate lcd object with default pins */
     lcd_ctor(lcd, data, en, regSel);
@@ -207,7 +231,7 @@ void lcdSetText(lcd_t * const lcd, char * text, int x, int y){
  * @brief Set integer
  * 
  * Detailed description starts here 
- * @param lcd    pointer to LCD object
+ * @param lcd   pointer to LCD object
  * @param val   integer value to be displayed
  * @param x     location at x-axis
  * @param y     location at y-axis
