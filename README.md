@@ -3,9 +3,12 @@
   <img src="images/lcd.png" height="250" width="500">
 </div>
 
-<center>
+<br>
+<div align='center'>
+
 [![esp-idf build](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/build.yml)
-</center>
+
+</div>
 
 ## **Description**
 This repository contains a custom lcd driver for 16x02 lcd. The driver has the most common function calls
