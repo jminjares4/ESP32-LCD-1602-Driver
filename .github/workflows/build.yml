@@ -59,7 +59,7 @@ jobs:
         esp_idf_version: ${{ matrix.idf_ver }}
         target: ${{ matrix.idf_target }}
         path: 'test'
-        
+
   build-release-v4_2:
     runs-on: ubuntu-latest
     steps:

@@ -171,7 +171,7 @@ void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_nu
     lcd->en = en;
     lcd->regSel = regSel;
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
     /* Select en and register select pin */
     esp_rom_gpio_pad_select_gpio(lcd->en);
     esp_rom_gpio_pad_select_gpio(lcd->regSel);
@@ -192,7 +192,7 @@ void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_nu
     /* Select all data pins */
     for (i = 0; i < LCD_DATA_LINE; i++)
     {
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
         esp_rom_gpio_pad_select_gpio(lcd->data[i]);
 #else
         gpio_pad_select_gpio(lcd->data[i]);
