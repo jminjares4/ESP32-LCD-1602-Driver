@@ -120,9 +120,9 @@ void app_main(void)
 
 ## **ESP32 LCD Driver Test**
 
-<center>
-  <img src="images/lcd_test.png" style="transform:rotate(270deg);" height="700">
-</center>
+<div align='center'>
+  <img src="images/lcd_test.png" style="transform:rotate(270deg);" height="450">
+</div>
 
 ## **Add ESP-LCD to ESP32 Project**
 1) Copy driver folder
