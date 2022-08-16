@@ -46,13 +46,11 @@ static void lcdTriggerEN(lcd_t *const lcd)
  */
 static void lownibble(lcd_t *const lcd, unsigned char x)
 {
-    // checkf if x is high for every bit
     uint8_t i, val = 0x01;
     for (i = 0; i < LCD_DATA_LINE; i++)
     {
+         /* check if x is high for every bit */
         gpio_set_level(lcd->data[i], (x >> i) & val);
-        //    (x & (val >> i)) ? gpio_set_level( lcd->data[LCD_DATA_LINE - i ], GPIO_STATE_HIGH) : gpio_set_level( lcd->data[LCD_DATA_LINE - i], GPIO_STATE_LOW);
-        // isHigh(x, bit >> i) ? gpio_set_level( lcd->data[i], GPIO_STATE_HIGH) : gpio_set_level( lcd->data[i], GPIO_STATE_LOW);
     }
 }
 
@@ -66,21 +64,20 @@ static void lownibble(lcd_t *const lcd, unsigned char x)
  */
 static void lcdWriteCmd(lcd_t *const lcd, unsigned char cmd, uint8_t lcd_opt)
 {
-    // CMD: 1, DATA: 0
+    /* CMD: 1, DATA: 0 */
     (lcd_opt == LCD_CMD) ? gpio_set_level(lcd->regSel, GPIO_STATE_LOW) : gpio_set_level(lcd->regSel, GPIO_STATE_HIGH);
 
-    // upper bits
+    /* upper bits */
     lownibble(lcd, cmd >> 4);
     lcdTriggerEN(lcd);
 
-    // lower bits
+    /* lower bits */
     lownibble(lcd, cmd);
     lcdTriggerEN(lcd);
 
-    // set delay
-    //  lcd_opt ? delay(10) : delay(1);
+    /* CMD : 1, DATA: 0 */
     if (lcd_opt == LCD_CMD)
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(10 / portTICK_PERIOD_MS); /* 10 ms delay */
 }
 
 /**
@@ -103,7 +100,7 @@ void lcd_init(lcd_t *const lcd)
     gpio_set_level(lcd->data[2], GPIO_STATE_LOW);
     gpio_set_level(lcd->data[3], GPIO_STATE_LOW);
 
-    // Send 0x03 3 times at 10ms then 100 us
+    /* Send 0x03 3 times at 10ms then 100 us */
     lcdTriggerEN(lcd);
     vTaskDelay(10 / portTICK_PERIOD_MS);
     lcdTriggerEN(lcd);
@@ -111,7 +108,7 @@ void lcd_init(lcd_t *const lcd)
     lcdTriggerEN(lcd);
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
-    // switch to 4-bit mode, 0x02
+    /* switch to 4-bit mode, 0x02 */
     gpio_set_level(lcd->en, GPIO_STATE_LOW);
     gpio_set_level(lcd->regSel, GPIO_STATE_LOW);
     gpio_set_level(lcd->data[0], GPIO_STATE_LOW);
@@ -119,10 +116,11 @@ void lcd_init(lcd_t *const lcd)
     gpio_set_level(lcd->data[2], GPIO_STATE_LOW);
     gpio_set_level(lcd->data[3], GPIO_STATE_LOW);
 
+    /* Trigger enable */
     lcdTriggerEN(lcd);
     vTaskDelay(10 / portTICK_PERIOD_MS);
 
-    // Initialize LCD
+    /* Initialize LCD */
     lcdWriteCmd(lcd, 0x28, LCD_CMD); // 4-bit, 2 line, 5x8
     lcdWriteCmd(lcd, 0x08, LCD_CMD); // Instruction Flow
     lcdWriteCmd(lcd, 0x01, LCD_CMD); // Clear LCD
@@ -173,7 +171,7 @@ void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_nu
     lcd->en = en;
     lcd->regSel = regSel;
 
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
     /* Select en and register select pin */
     esp_rom_gpio_pad_select_gpio(lcd->en);
     esp_rom_gpio_pad_select_gpio(lcd->regSel);
@@ -194,7 +192,7 @@ void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_nu
     /* Select all data pins */
     for (i = 0; i < LCD_DATA_LINE; i++)
     {
-#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 4, 0)
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 0, 0)
         esp_rom_gpio_pad_select_gpio(lcd->data[i]);
 #else
         gpio_pad_select_gpio(lcd->data[i]);
