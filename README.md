@@ -3,6 +3,10 @@
   <img src="images/lcd.png" height="250" width="500">
 </div>
 
+<center>
+[![esp-idf build](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/build.yml)
+</center>
+
 ## **Description**
 This repository contains a custom lcd driver for 16x02 lcd. The driver has the most common function calls
 that are use for LCDs. ESP32 have limited GPIO pins, therefore the driver was developed to use 4-bit mode which requires a total of 6 GPIO pins. However, there are two configurations for the driver: default and custom. The default configurations uses [this](#lcd-16x02-pinout) pinout while the custom allows the user to select whichever GPIO are avaiable simple by using `lcd_ctor()`.
