@@ -72,19 +72,19 @@ is customizable to allow users to change GPIO pins if necessary.
 
 | **Function**  | **Description**                 |
 | :---          | :---                            |
-| lcd_default() | Default pinout                  |
-| lcd_ctor()    | Customizable pinout constructor |
-| lcdSetText()  | Set text                        |
+| lcd_default   | Default pinout                  |
+| lcd_ctor      | Customizable pinout constructor |
+| lcdSetText    | Set text                        |
 | lcdSetInt     | Set integer                     |
-| lcdClear()    | Clear previous data             |
+| lcdClear      | Clear previous data             |
 
 ## **Simple Example Code**
 The follow section of code demostrate how to use the lcd driver with default configuration.
 ~~~c
 #include <stdio.h>
-#include "driver/esp_lcd.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "driver/esp_lcd.h"
 
 /* LCD task */
 void lcd_task(void *pvParameters){
@@ -92,6 +92,7 @@ void lcd_task(void *pvParameters){
   /* Create LCD object */
   lcd_t lcd;
 
+  /* Set lcd to default pins */
   lcd_default(&lcd);
 
   /* Initialize LCD object */
@@ -121,7 +122,7 @@ void app_main(void)
 ## **ESP32 LCD Driver Test**
 
 <div align='center'>
-  <img src="images/lcd_test.png" style="transform:rotate(270deg);" height="450">
+  <img src="images/lcd_test.png" height="450">
 </div>
 
 ## **Add ESP-LCD to ESP32 Project**
