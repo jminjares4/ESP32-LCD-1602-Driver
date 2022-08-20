@@ -9,17 +9,25 @@
  *
  */
 
-#include "esp_lcd.h"
 #include <stdio.h>
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_idf_version.h"
+#include "esp_lcd.h"
 
 #define LCD_DATA 0        /*!< LCD data */
 #define LCD_CMD 1         /*!< LCD command */
 #define GPIO_STATE_LOW 0  /*!< Logic low */
 #define GPIO_STATE_HIGH 1 /*!< Logic high */
+
+/* Default pinout  */
+#define DATA_0_PIN 19          /*!< DATA 0 */
+#define DATA_1_PIN 18          /*!< DATA 0 */
+#define DATA_2_PIN 17          /*!< DATA 0 */
+#define DATA_3_PIN 16          /*!< DATA 0 */
+#define ENABLE_PIN 22          /*!< Enable  */
+#define REGISTER_SELECT_PIN 23 /*!< Register Select  */
 
 /**
  * @brief Trigger LCD enable pin
@@ -49,7 +57,7 @@ static void lownibble(lcd_t *const lcd, unsigned char x)
     uint8_t i, val = 0x01;
     for (i = 0; i < LCD_DATA_LINE; i++)
     {
-         /* check if x is high for every bit */
+        /* check if x is high for every bit */
         gpio_set_level(lcd->data[i], (x >> i) & val);
     }
 }
@@ -77,7 +85,9 @@ static void lcdWriteCmd(lcd_t *const lcd, unsigned char cmd, uint8_t lcd_opt)
 
     /* CMD : 1, DATA: 0 */
     if (lcd_opt == LCD_CMD)
+    {
         vTaskDelay(10 / portTICK_PERIOD_MS); /* 10 ms delay */
+    }
 }
 
 /**
@@ -87,12 +97,12 @@ static void lcdWriteCmd(lcd_t *const lcd, unsigned char cmd, uint8_t lcd_opt)
  * @note  Must constructor LCD object. @see lcd_ctor() and @see lcd_default()
  * @return None
  */
-void lcd_init(lcd_t *const lcd)
+void lcdInit(lcd_t *const lcd)
 {
     /* 100 ms delay */
     vTaskDelay(100 / portTICK_PERIOD_MS);
 
-    // set 0x03 to LCD
+    /* set 0x03 to LCD */
     gpio_set_level(lcd->en, GPIO_STATE_LOW);
     gpio_set_level(lcd->regSel, GPIO_STATE_LOW);
     gpio_set_level(lcd->data[0], GPIO_STATE_HIGH);
@@ -136,16 +146,16 @@ void lcd_init(lcd_t *const lcd)
  *
  * @return None
  */
-void lcd_default(lcd_t *const lcd)
+void lcdDefault(lcd_t *const lcd)
 {
 
     /* Default pins */
-    gpio_num_t data[4] = {19, 18, 17, 16}; /* Data pins */
-    gpio_num_t en = 22;                    /* Enable pin */
-    gpio_num_t regSel = 23;                /* Register Select pin */
+    gpio_num_t data[LCD_DATA_LINE] = {DATA_0_PIN, DATA_1_PIN, DATA_2_PIN, DATA_3_PIN}; /* Data pins */
+    gpio_num_t en = ENABLE_PIN;                                                        /* Enable pin */
+    gpio_num_t regSel = REGISTER_SELECT_PIN;                                           /* Register Select pin */
 
     /* Instantiate lcd object with default pins */
-    lcd_ctor(lcd, data, en, regSel);
+    lcdCtor(lcd, data, en, regSel);
 }
 
 /**
@@ -158,7 +168,7 @@ void lcd_default(lcd_t *const lcd)
  * @param regSel    register select
  * @return          None
  */
-void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_num_t regSel)
+void lcdCtor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_num_t regSel)
 {
     /* Map each data pin to LCD object */
     int i;
@@ -208,6 +218,8 @@ void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_nu
     {
         gpio_set_level(lcd->data[i], GPIO_STATE_LOW);
     }
+
+    lcd->state = (lcd_state_t)LCD_ACTIVE;
 }
 
 /**
@@ -218,35 +230,41 @@ void lcd_ctor(lcd_t *lcd, gpio_num_t data[LCD_DATA_LINE], gpio_num_t en, gpio_nu
  * @param text  string text
  * @param x     location at x-axis
  * @param y     location at y-axis
- * @return      None
+ * @return      lcd error status @see lcd_err_t
  */
-void lcdSetText(lcd_t *const lcd, char *text, int x, int y)
+lcd_err_t lcdSetText(lcd_t *const lcd, char *text, int x, int y)
 {
-    int i;
-    if (x < 16)
+    /* Check if lcd is active */
+    if (lcd->state == LCD_ACTIVE)
     {
-        x |= 0x80; // Set LCD for first line write
-        switch (y)
+        int i;
+        if (x < 16)
         {
-        case 1:
-            x |= 0x40; // Set LCD for second line write
-            break;
-        case 2:
-            x |= 0x60; // Set LCD for first line write reverse
-            break;
-        case 3:
-            x |= 0x20; // Set LCD for second line write reverse
-            break;
+            x |= 0x80; // Set LCD for first line write
+            switch (y)
+            {
+            case 1:
+                x |= 0x40; // Set LCD for second line write
+                break;
+            case 2:
+                x |= 0x60; // Set LCD for first line write reverse
+                break;
+            case 3:
+                x |= 0x20; // Set LCD for second line write reverse
+                break;
+            }
+            lcdWriteCmd(lcd, x, LCD_CMD);
         }
-        lcdWriteCmd(lcd, x, LCD_CMD);
+        i = 0;
+        /* Write text */
+        while (text[i] != '\0')
+        {
+            lcdWriteCmd(lcd, text[i], LCD_DATA);
+            i++;
+        }
     }
-    i = 0;
-
-    while (text[i] != '\0')
-    {
-        lcdWriteCmd(lcd, text[i], LCD_DATA);
-        i++;
-    }
+    /* return lcd status */
+    return lcd->state == LCD_ACTIVE ? LCD_OK : LCD_FAIL;
 }
 
 /**
@@ -257,22 +275,68 @@ void lcdSetText(lcd_t *const lcd, char *text, int x, int y)
  * @param val   integer value to be displayed
  * @param x     location at x-axis
  * @param y     location at y-axis
- * @return      None
+ * @return      lcd error status @see lcd_err_t
  */
-void lcdSetInt(lcd_t *const lcd, int val, int x, int y)
+lcd_err_t lcdSetInt(lcd_t *const lcd, int val, int x, int y)
 {
-    char buffer[16];
-    sprintf(buffer, "%d", val);
-    lcdSetText(lcd, buffer, x, y);
+    /* Check if lcd is active */
+    if (lcd->state == LCD_ACTIVE)
+    {
+        /* Store integer to buffer */
+        char buffer[16];
+        sprintf(buffer, "%d", val);
+        /* Set integer */
+        lcdSetText(lcd, buffer, x, y);
+    }
+    /* return lcd status */
+    return lcd->state == LCD_ACTIVE ? LCD_OK : LCD_FAIL;
 }
 
 /**
  * @brief Clear LCD screen
  * Detailed description starts here
- * @param lcd    pointer to LCD object
- * @return      None
+ * @param lcd   pointer to LCD object
+ * @return      lcd error status @see lcd_err_t 
  */
-void lcdClear(lcd_t *const lcd)
+lcd_err_t lcdClear(lcd_t *const lcd)
 {
-    lcdWriteCmd(lcd, 0x01, LCD_CMD);
+    /* Check if lcd is active */
+    if (lcd->state == LCD_ACTIVE)
+    {
+        /* Clear LCD screen */
+        lcdWriteCmd(lcd, 0x01, LCD_CMD);
+    }
+
+    /* return lcd status */
+    return lcd->state == LCD_ACTIVE ? LCD_OK : LCD_FAIL;
+}
+
+/**
+ * @brief Reset pins to default configuration. Freeing GPIO pins.
+ * @param lcd   pointer to LCD object
+ * @note        This function will set GPIO pins to reset configuration,
+ *              disabling the LCD. @see gpio_reset_pin()
+ */
+void lcdFree(lcd_t *const lcd)
+{
+    /* Reset data pins to default configuration */
+    for (int i = 0; i < LCD_DATA_LINE; i++)
+    {
+        gpio_reset_pin(lcd->data[i]);
+    }
+    /* Reset enable pin to default configuration */
+    gpio_reset_pin(lcd->en);
+    /* Reset register select pin to default configuration */
+    gpio_reset_pin(lcd->regSel);
+
+    /* Update gpio pins to no connection */
+    for (int i = 0; i < LCD_DATA_LINE; i++)
+    {
+        lcd->data[i] = GPIO_NUM_NC; /* Set to no connection */
+    }
+
+    lcd->en = GPIO_NUM_NC;     /* Set to no connection */
+    lcd->regSel = GPIO_NUM_NC; /* Set to no connection */
+
+    lcd->state = (lcd_state_t)LCD_INACTIVE;
 }
