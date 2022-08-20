@@ -12,7 +12,12 @@
 #include "driver/esp_lcd.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_log.h"
 
+/* LCD tag */
+static const char *lcd_tag = "LCD tag";
+
+/* Default lcd */
 #define DEFAULT_LCD
 
 void lcd_task(void *pvParameters)
@@ -22,7 +27,8 @@ void lcd_task(void *pvParameters)
   lcd_t lcd;
 
 #ifdef DEFAULT_LCD
-  lcd_default(&lcd);
+  /* Set default pinout */
+  lcdDefault(&lcd);
 #else
   /* Set pins */
   gpio_num_t data[4] = {19, 18, 17, 16}; /* Data pins */
@@ -30,12 +36,12 @@ void lcd_task(void *pvParameters)
   gpio_num_t regSel = 23;                /* Register Select pin */
 
   /* Constructor LCD object */
-  lcd_ctor(&lcd, data, en, regSel);
+  lcdCtor(&lcd, data, en, regSel);
 
 #endif
 
   /* Initialize LCD object */
-  lcd_init(&lcd);
+  lcdInit(&lcd);
 
   /* Clear previous data on LCD */
   lcdClear(&lcd);
@@ -44,11 +50,35 @@ void lcd_task(void *pvParameters)
   char buffer[16];
   float version = 1.0;
   char initial[2] = {'J', 'M'};
-  sprintf(buffer, "ESP v%.2f %c%c", version, initial[0], initial[1]);
+  sprintf(buffer, "ESP v%.1f %c%c", version, initial[0], initial[1]);
 
+  /* Set text */
   lcdSetText(&lcd, buffer, 0, 0);
-
+  
+  /* Initialize count */
   int count = 0;
+
+  /* 5 second run */
+  vTaskDelay(5000 / portTICK_PERIOD_MS);
+
+  /* Free LCD */
+  lcdFree(&lcd);
+
+  /* Set text */
+  lcd_err_t ret = lcdSetText(&lcd, "Count: ", 0, 1);
+  /* Check lcd status */
+  if(ret == LCD_FAIL){ 
+      ESP_LOGE(lcd_tag, "LCD has failed!!!\n"); /* Display error message */
+  }
+
+#ifdef DEFAULT_LCD
+  lcdDefault(&lcd); /* Re-enable lcd default pins */
+#else
+  lcdCtor(&lcd, data, en, regSel); /* Re-enable lcd custom pins */
+#endif
+  lcdInit(&lcd); /* Re-intialize lcd */
+  sprintf(buffer, "ESP v%.1f %c%c", version, initial[0], initial[1]); /* Reset custom text*/
+  lcdSetText(&lcd, buffer, 0, 0);   /* Set text */
 
   while (1)
   {
@@ -62,7 +92,6 @@ void lcd_task(void *pvParameters)
 
 void app_main(void)
 {
-
   /* Create LCD task */
   xTaskCreate(lcd_task, "LCD task", 2048, NULL, 4, NULL);
 }
