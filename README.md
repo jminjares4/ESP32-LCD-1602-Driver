@@ -11,8 +11,8 @@
 </div>
 
 ## **Description**
-This repository contains a custom lcd driver for 16x02 lcd. The driver has the most common function calls
-that are use for LCDs. ESP32 have limited GPIO pins, therefore the driver was developed to use 4-bit mode which requires a total of 6 GPIO pins. However, there are two configurations for the driver: default and custom. The default configurations uses [this](#lcd-16x02-pinout) pinout while the custom allows the user to select whichever GPIO are avaiable simple by using `lcd_ctor()`.
+This repository contains a custom lcd driver for *16x02 lcd*. The driver has the most common function calls
+that are use for LCDs. ESP32 have limited GPIO pins, therefore **4-bit mode** was use as it requires a total of **6** `GPIO` pins. However, there are two configurations for the driver: default and custom. The default configurations uses [this](#lcd-16x02-pinout) pinout while the custom allows the user to select whichever `GPIO` are avaiable simple by using `lcdCtor()`.
 
 ### **ESP32 Pinout**
 ~~~
@@ -72,11 +72,12 @@ is customizable to allow users to change GPIO pins if necessary.
 
 | **Function**  | **Description**                 |
 | :---          | :---                            |
-| lcd_default   | Default pinout                  |
-| lcd_ctor      | Customizable pinout constructor |
+| lcdDefault    | Default pinout                  |
+| lcdCtor       | Customizable pinout constructor |
 | lcdSetText    | Set text                        |
 | lcdSetInt     | Set integer                     |
 | lcdClear      | Clear previous data             |
+| lcdFree       | Free LCD pins                   |
 
 ## **Simple Example Code**
 The follow section of code demostrate how to use the lcd driver with default configuration.
@@ -93,10 +94,10 @@ void lcd_task(void *pvParameters){
   lcd_t lcd;
 
   /* Set lcd to default pins */
-  lcd_default(&lcd);
+  lcdDefault(&lcd);
 
   /* Initialize LCD object */
-  lcd_init(&lcd);
+  lcdInit(&lcd);
 
   /* Clear previous data on LCD */
   lcdClear(&lcd);
