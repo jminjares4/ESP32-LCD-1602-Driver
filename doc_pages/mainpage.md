@@ -53,8 +53,8 @@ is customizable to allow users to change GPIO pins if necessary.
 
 | **ESP32 Pins**                            | **LCD Pin** |  **Description**  |   
 | :---:                                     |  :--:       |   :---:           |
-| `GND`, 10k Potentiometer Output (V&#177;) |      1      | GND               |  
-| `VCC`, 10k Potentiometer Output (V&#177;) |      2      | VCC               |    
+| `GND`, 10k Potentiometer Output (V±)      |      1      | GND               |  
+| `VCC`, 10k Potentiometer Output (V±)      |      2      | VCC               |    
 | 10k Potentiometer Output (V<sub>o</sub>)  |      3      | Contrast          |    
 | `GPIO23`                                  |      4      | RS (Register Select): 0–Command, 1-Data |    
 | `GND`                                     |      5      | R/W (Read/Write): 0 – Write, 1 - Read   |    
