@@ -4,7 +4,6 @@
  * @brief Liquid Crystal Display header file
  * @version 0.1
  * @date 2022-08-15
- *
  * @copyright Copyright (c) 2022
  *
  */
@@ -22,11 +21,29 @@ typedef int lcd_err_t;      /*!< LCD error type */
 
 #define LCD_DATA_LINE 4 /*!< 4-Bit data line */
 
+/******************************************************************
+ * \enum lcd_state esp_lcd.h 
+ * \brief LCD state enumeration
+ *******************************************************************/
 typedef enum {
     LCD_INACTIVE = 0,   /*!< LCD inactive */
     LCD_ACTIVE = 1,     /*!< LCD active   */
 }lcd_state_t;
 
+/******************************************************************
+ * \struct lcd_t esp_lcd.h 
+ * \brief LCD object
+ * 
+ * ### Example
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~.c
+ * typedef struct {
+ *      gpio_num_t data[LCD_DATA_LINE];
+ *      gpio_num_t en;
+ *      gpio_num_t regSel;
+ *      lcd_state_t state;
+ * }lcd_t;
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ *******************************************************************/
 typedef struct
 {
     gpio_num_t data[LCD_DATA_LINE]; /*!< LCD data line  */
@@ -48,5 +65,7 @@ lcd_err_t lcdSetInt(lcd_t *const lcd, int val, int x, int y);
 lcd_err_t lcdClear(lcd_t *const lcd);
 
 void lcdFree(lcd_t * const lcd);
+
+void assert_lcd(lcd_err_t lcd_error);
 
 #endif
