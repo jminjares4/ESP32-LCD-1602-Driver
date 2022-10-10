@@ -1,6 +1,6 @@
-
+# ESP32 LCD Driver
 <div align="center">
-  <img src="images/lcd.png" height="250" width="500">
+  <img src="lcd.png" height="250" width="500">
 </div>
 
 <br>
@@ -8,13 +8,14 @@
 
 [![esp-idf build](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/build.yml)[![Documentation](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/documentation.yml/badge.svg)](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/documentation.yml)
 [![pages-build-deployment](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/jminjares4/ESP32-LCD-1602-Driver/actions/workflows/pages/pages-build-deployment)[![GitHub Page](https://img.shields.io/badge/active-34c855.svg?style=flat&logo=github&logoColor=949da5&label=GitHub%20Page&labelColor=3f4851)](https://jminjares4.github.io/ESP32-LCD-1602-Driver/)
+
 </div>
 
-## **Description**
+## Description
 This repository contains a custom lcd driver for *16x02 lcd*. The driver has the most common function calls
 that are use for LCDs. ESP32 have limited GPIO pins, therefore **4-bit mode** was use as it requires a total of **6** `GPIO` pins. However, there are two configurations for the driver: default and custom. The default configurations uses [this](#lcd-16x02-pinout) pinout while the custom allows the user to select whichever `GPIO` are avaiable simple by using `lcdCtor()`.
 
-### **ESP32 Pinout**
+### ESP32 Pinout
 ~~~
                                          +-----------------------+
                                          | O      | USB |      O |
@@ -43,10 +44,12 @@ that are use for LCDs. ESP32 have limited GPIO pins, therefore **4-bit mode** wa
 ~~~
 
 
-## **LCD 16x02 Pinout**
+## LCD 16x02 Pinout
 
 The following pinout is the default configuration of the ESP-LCD driver. However, the driver 
 is customizable to allow users to change GPIO pins if necessary.
+
+<div align='center'>
 
 | **ESP32 Pins**                            | **LCD Pin** |  **Description**  |   
 | :---:                                     |  :--:       |   :---:           |
@@ -64,22 +67,27 @@ is customizable to allow users to change GPIO pins if necessary.
 | `GPIO18`                                  |      12     | Data 5            |    
 | `GPIO17`                                  |      13     | Data 6            |    
 | `GPIO16`                                  |      14     | Data 7            |    
-| 100&#8486; to `VCC`                       |      15     | Backlight Anode (+)  |    
-| `GND`                                     |      16     | Backlight Cathode (-)|    
+| 100Ω to `VCC`                             |      15     | Backlight Anode (+)  |    
+| `GND`                                     |      16     | Backlight Cathode (-)|
+
+</div>
   * LCD default pin configuration
   
-## **LCD Main Functions**
+## LCD Main Functions
+<div align='center'>
 
-| **Function**  | **Description**                 |
-| :---          | :---                            |
-| lcdDefault    | Default pinout                  |
-| lcdCtor       | Customizable pinout constructor |
-| lcdSetText    | Set text                        |
-| lcdSetInt     | Set integer                     |
-| lcdClear      | Clear previous data             |
-| lcdFree       | Free LCD pins                   |
+| **Function**    | **Description**                 |
+| :---            | :---                            |
+| lcdDefault()    | Default pinout                  |
+| lcdCtor()       | Customizable pinout constructor |
+| lcdSetText()    | Set text                        |
+| lcdSetInt()     | Set integer                     |
+| lcdClear()      | Clear previous data             |
+| lcdFree()       | Free LCD pins                   |
 
-## **Simple Example Code**
+</div>
+
+## Simple Example Code
 The follow section of code demostrate how to use the lcd driver with default configuration.
 ~~~c
 #include <stdio.h>
@@ -104,7 +112,7 @@ void lcd_task(void *pvParameters){
 
   while(1){
     /* Display text */
-    lcdSetText(&lcd,"Hello World!", 0,0);
+    lcdSetText(&lcd, "Hello World!", 0,0);
     /* 1 second delay */
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
@@ -120,13 +128,13 @@ void app_main(void)
 }
 ~~~
 
-## **ESP32 LCD Driver Test**
+## ESP32 LCD Driver Test
 
 <div align='center'>
-  <img src="images/lcd_test.png" height="450">
+  <img src="lcd_test.png" height="450">
 </div>
 
-## **Add ESP-LCD to ESP32 Project**
+## Add ESP-LCD to ESP32 Project
 1) Copy driver folder
 2) Paste into esp project
 3) Edit project CMakeLists.txt to use esp_lcd:
@@ -136,20 +144,20 @@ idf_component_register(SRCS "main.c"
                     INCLUDE_DIRS ".")
 ```
 
-## **Development**
+## Development
 |Microcontroller|Software|Enviroment|Operating System|
 | :---| :---| :---| :---|
 | ![ESP32](https://img.shields.io/static/v1?label=&logo=espressif&message=Espressif+ESP32&&color=000000) | ![C Language](https://img.shields.io/badge/Code-C-informational?style=flat&logo=C&color=003B57)| ![Visual Studio Code](https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=flat&logo=visual%20studio%20code&logoColor=white&logoHeight=50&logoWidht=50) | ![FreeRTOS](https://img.shields.io/static/v1?label=OS&message=FreeRTOS&color=white&labelColor=green&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAABLFBMVEUAAAA3Nzc4ODg6Ojo7OzsRERESEhITExMgICBFRUVHR0cMDAwNDQ0ODg4LCwsPDw8ZGRkUFBQVFRUJCQkKCgoLCwsUFBQNDQ0TExMKCgoICAgKCgoICAgKCgoLCwsGBgYGBgYHBwcICAgICAgJCQkICAgFBQUHBwcFBQUHBwcFBQUGBgYFBQUEBAQEBAQEBAQDAwMDAwMEBAQDAwMDAwMDAwMDAwMCAgIDAwMCAgIDAwMCAgICAgICAgIDAwMCAgIDAwMCAgICAgIDAwMCAgICAgIBAQEBAQECAgIBAQEBAQECAgIBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAAAABAQEAAAAAAAABAQEAAAAAAAAAAAABAQEAAAAAAAAAAAAAAADpWFtfAAAAY3RSTlMAAgICAgQEBAQEBAgICAoKCgwMDg4ODhAQFBYWGBgYGhwcHiAgIiYmKCosMDg8QkRKTExSVFZcXl5gYGJmampubnR4en6PlZeXnaWlra%2Bztbe7vcHDz9Pb293f4fHz9fX3%2Bf1wHG5lAAACEklEQVR42pXWhWKjWhgE4Km7u7u7u7u3cSU08%2F7PcO%2Fuz8HJEr5KdHDmHPjMHj%2FG8yWylI8%2FHs8ixOhNki7Jm1FUNv2sk9rX7fbScEvr8NL27ZdG6k8zCNZ%2Br5Pf%2B11w6Nr7JvX7dgRYTZHvqwHvv5OpgPf3NWY3EWgzS20fHtfkWz8q6Hsjr33fv6tBRfV3nsQ%2BeYl%2FuiT3Hful8Q4h7qgZe06iPcW3OjgN6CTdZ7n%2Bjal2Fbhntg8uxyR5A5f%2BLO%2BNwIzOTZgm%2Fv5rTJJkrlO9oWxSn5HAE99h2v2N7QyufFD8rPVufZYPYXrnkwR0rtrfp4%2BdWKU%2BCpD8hjKkM0B5Dso3bwAqaqUBEjDtMekJbDDAnn3tapyFS3OZfhOwfPEYLgs06C9nR49FGtZhueUjnBreKdKLcv8lKWJtMG0zDtvIeYridxliqkCRuRqHYYl52ApUXqE8UCn3QAyzBJtG5QLKAU2DEK0kyNaqA6LE4ao3SeS5VPVOizi3qz6s4pG3gSfuxH%2FiDMf8Crk0xuAyS03KMeziowIkjXfCLm87cBN6A81D%2BZbAaJRblATgKYHtnpV3itha96a7BJ4l4KqZyb%2F%2FmirVzLQE%2FhZZf3iR9f0tMglIVdaHVWWdVCUZuYyj1709oNSjolpjQIk%2BZEUfFKMPu%2F6BfS9oYO9AsJkna%2BrQ2hI%2BdYg%2BOfFPf05n4fU%2FmeU4udThUscAAAAASUVORK5CYII%3D)|
 
-# **License and Release**
+# License and Release
 
 | **License** | **Release** |
 | :---    | :---    |
 | [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) |  [![Release](https://img.shields.io/github/v/release/jminjares4/ESP32-LCD-1602-Driver)](https://github.com/jminjares4/ESP32-LCD-1602-Driver/releases)        |
 
 
-## **Author**
-* [**Jesus Minjares** :zap:](https://github.com/jminjares4)<br>
+## Author
+* [**Jesus Minjares**](https://github.com/jminjares4)<br>
   * Master of Science in Computer Engineering<br>
 [![Outlook](https://img.shields.io/badge/Microsoft_Outlook-0078D4?style=for-the-badge&logo=microsoft-outlook&logoColor=white&style=flat)](mailto:jminjares4@miners.utep.edu) 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&style=flat)](https://www.linkedin.com/in/jesusminjares/) [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white&style=flat)](https://github.com/jminjares4)

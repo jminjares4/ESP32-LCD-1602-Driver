@@ -53,8 +53,11 @@ void lcd_task(void *pvParameters)
   sprintf(buffer, "ESP v%.1f %c%c", version, initial[0], initial[1]);
 
   /* Set text */
-  lcdSetText(&lcd, buffer, 0, 0);
-  
+  lcd_err_t ret = lcdSetText(&lcd, buffer, 0, 0);
+
+  /* Check lcd status */
+  assert_lcd(ret);
+
   /* Initialize count */
   int count = 0;
 
@@ -65,27 +68,39 @@ void lcd_task(void *pvParameters)
   lcdFree(&lcd);
 
   /* Set text */
-  lcd_err_t ret = lcdSetText(&lcd, "Count: ", 0, 1);
+  ret = lcdSetText(&lcd, "Count: ", 0, 1);
+
   /* Check lcd status */
-  if(ret == LCD_FAIL){ 
-      ESP_LOGE(lcd_tag, "LCD has failed!!!\n"); /* Display error message */
-  }
+  assert_lcd(ret);
 
 #ifdef DEFAULT_LCD
   lcdDefault(&lcd); /* Re-enable lcd default pins */
 #else
   lcdCtor(&lcd, data, en, regSel); /* Re-enable lcd custom pins */
 #endif
-  lcdInit(&lcd); /* Re-intialize lcd */
+  lcdInit(&lcd);                                                      /* Re-intialize lcd */
   sprintf(buffer, "ESP v%.1f %c%c", version, initial[0], initial[1]); /* Reset custom text*/
-  lcdSetText(&lcd, buffer, 0, 0);   /* Set text */
+  ret = lcdSetText(&lcd, buffer, 0, 0);                               /* Set text */
+
+  /* Check lcd status */
+  assert_lcd(ret);
 
   while (1)
   {
     /* Display text */
-    lcdSetText(&lcd, "Count: ", 0, 1);
-    lcdSetInt(&lcd, count, 8, 1);
+    ret = lcdSetText(&lcd, "Count: ", 0, 1);
+
+    /* Check lcd status */
+    assert_lcd(ret);
+    ret = lcdSetInt(&lcd, count, 8, 1);
+
+    /* Check lcd status */
+    assert_lcd(ret);
+
+    /* Increment count */
     count++;
+    
+    /* 1 second delay */
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }

@@ -15,6 +15,11 @@
 #include "freertos/task.h"
 #include "esp_idf_version.h"
 #include "esp_lcd.h"
+#include "esp_log.h"
+
+
+/* LCD tag */
+static const char *lcd_tag = "LCD tag"; /*! < LCD tag */
 
 #define LCD_DATA 0        /*!< LCD data */
 #define LCD_CMD 1         /*!< LCD command */
@@ -339,4 +344,15 @@ void lcdFree(lcd_t *const lcd)
     lcd->regSel = GPIO_NUM_NC; /* Set to no connection */
 
     lcd->state = (lcd_state_t)LCD_INACTIVE;
+}
+
+void assert_lcd(lcd_err_t lcd_error){
+    if (lcd_error == LCD_FAIL)
+    {
+      ESP_LOGE(lcd_tag, "LCD has failed!!!\n"); /* Display error message */
+    }
+    else
+    {
+      ESP_LOGI(lcd_tag, "LCD write was sucessfull...\n");
+    }
 }
