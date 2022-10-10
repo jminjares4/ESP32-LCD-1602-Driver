@@ -49,4 +49,6 @@ lcd_err_t lcdClear(lcd_t *const lcd);
 
 void lcdFree(lcd_t * const lcd);
 
+void assert_lcd(lcd_err_t lcd_error);
+
 #endif
