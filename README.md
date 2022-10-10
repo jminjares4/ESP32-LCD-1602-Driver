@@ -104,7 +104,7 @@ void lcd_task(void *pvParameters){
 
   while(1){
     /* Display text */
-    lcdSetText("Hello World!", 0,0);
+    lcdSetText(&lcd,"Hello World!", 0,0);
     /* 1 second delay */
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
