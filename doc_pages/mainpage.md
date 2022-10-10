@@ -84,6 +84,7 @@ is customizable to allow users to change GPIO pins if necessary.
 | lcdSetInt()     | Set integer                     |
 | lcdClear()      | Clear previous data             |
 | lcdFree()       | Free LCD pins                   |
+| assert_lcd()    | Check lcd status                |
 
 </div>
 
